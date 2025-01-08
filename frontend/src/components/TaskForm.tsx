@@ -50,6 +50,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onCreateTask }) => {
         confirmButtonText: "OK",
       });
       setFormData({ title: "", description: "" });
+      console.log(typeof newTask.id, newTask.id);
     }
   };
 
