@@ -19,6 +19,7 @@ const App: React.FC = () => {
       isCompleted: false,
       createdAt: new Date().toISOString(),
     };
+
     const updatedTasks = [...tasks, newTask];
     setTasks(updatedTasks);
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
