@@ -143,7 +143,7 @@ To start the development server:
 npm run dev
 ```
 
-localhost server: [Link Text](http://localhost:5173/)
+localhost server: http://localhost:5173/
 
 ### For Backend
 
