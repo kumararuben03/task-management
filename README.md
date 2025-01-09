@@ -143,6 +143,8 @@ To start the development server:
 npm run dev
 ```
 
+localhost server: [Link Text](http://localhost:5173/)
+
 ### For Backend
 
 To install packages:
@@ -158,6 +160,8 @@ cd backend
 dotnet watch run
 ```
 
+localhost server: http://localhost:5229/swagger/index.html
+
 ### For Database
 
 To generate a migration file that describes changes done to the model:
@@ -171,8 +175,6 @@ To update the database (MSSQL, MYSQL, any database of choice):
 ```bash
 dotnet ef database update
 ```
-
-## Implementation
 
 ## Screenshots
 
