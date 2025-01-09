@@ -20,6 +20,6 @@ namespace backend.Models
     public bool IsCompleted { get; set; } = false;
 
     [Required]
-    public DateOnly IsCreated { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+    public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
     }
 }

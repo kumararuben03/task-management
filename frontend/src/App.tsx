@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TaskList from "./components/TaskList";
-import TaskForm from "./components/TaskForm";
 import { Task } from "./types/Task";
+import logo from "./assets/logo.png";
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -47,9 +47,9 @@ const App: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1 className="text-center fw-bold mt-5">Task Management System</h1>
-      <TaskForm onCreateTask={handleCreateTask} />
+    <div className="app-container">
+      <img src={logo} alt="Logo" className="logo" />
+      <h1 className="text-center fw-bold mt-3">Task Management System</h1>
       <TaskList
         tasks={tasks}
         onEdit={handleEditTask}

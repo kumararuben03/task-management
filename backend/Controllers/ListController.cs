@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using backend.Data;
 using backend.DTOs;
 using backend.Models;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,21 +22,19 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-
-        public IActionResult GetAllLists()
+        public async Task<IActionResult> GetAllLists()
         {
-            var allLists = dbContext.Lists.ToList();
-
+            var allLists = await dbContext.Lists.ToListAsync();
             return Ok(allLists);
         }
 
         [HttpGet]
         [Route("{id:long}")]
-        public IActionResult GetListById(long id)
+        public async Task<IActionResult> GetListById(long id)
         {
-            var list = dbContext.Lists.Find(id);
+            var list = await dbContext.Lists.FindAsync(id);
 
-            if(list is null)
+            if (list is null)
             {
                 return NotFound();
             }
@@ -46,27 +43,27 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddList(AddListDto addListDto)
+        public async Task<IActionResult> AddList(AddListDto addListDto)
         {
-            var listEntity = new List()
+            var listEntity = new List
             {
                 Title = addListDto.Title,
                 Description = addListDto.Description,
-
             };
+
             dbContext.Lists.Add(listEntity);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             return Ok(listEntity);
         }
 
         [HttpPut]
-
-        public IActionResult UpdateList(long id, UpdateListDto updateListDto)
+        [Route("{id:long}")]
+        public async Task<IActionResult> UpdateList(long id, UpdateListDto updateListDto)
         {
-            var list = dbContext.Lists.Find(id);
+            var list = await dbContext.Lists.FindAsync(id);
 
-            if(list is null)
+            if (list is null)
             {
                 return NotFound();
             }
@@ -75,15 +72,16 @@ namespace backend.Controllers
             list.Description = updateListDto.Description;
             list.IsCompleted = updateListDto.IsCompleted;
 
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             return Ok(list);
         }
+
         [HttpDelete]
         [Route("{id:long}")]
-        public IActionResult DeleteList(long id)
+        public async Task<IActionResult> DeleteList(long id)
         {
-            var list = dbContext.Lists.Find(id);
+            var list = await dbContext.Lists.FindAsync(id);
 
             if (list is null)
             {
@@ -91,7 +89,7 @@ namespace backend.Controllers
             }
 
             dbContext.Lists.Remove(list);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             return Ok();
         }

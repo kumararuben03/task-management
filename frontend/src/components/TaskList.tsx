@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TaskItem from "./TaskItem";
+import TaskForm from "./TaskForm";
 import "./../styles/TaskList.css";
 import { Task } from "../types/Task";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal } from "react-bootstrap";
 import Swal from "sweetalert2";
+
+import {
+  getTasks,
+  createTask,
+  updateTask,
+  deleteTask,
+} from "../services/TaskService"; // Adjust the import path accordingly
 
 interface TaskListProps {
   tasks: Task[];
@@ -14,20 +22,38 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({
-  tasks,
   onEdit,
   onDelete,
   onToggleComplete,
 }) => {
+  const [tasks, setTasks] = useState<Task[]>([]); // Initialize tasks state
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 5;
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ title: "", description: "" });
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    isCompleted: false,
+  });
   const [errors, setErrors] = useState<{
     title?: string;
     description?: string;
   }>({});
+
+  // Fetch tasks from the backend on initial load
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const fetchedTasks = await getTasks();
+        setTasks(fetchedTasks);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, []);
 
   const indexOfLastTask = currentPage * tasksPerPage;
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
@@ -37,22 +63,21 @@ const TaskList: React.FC<TaskListProps> = ({
 
   const handleEdit = (task: Task) => {
     setSelectedTask(task);
-    setFormData({ title: task.title, description: task.description });
+    setFormData({
+      title: task.title,
+      description: task.description,
+      isCompleted: task.isCompleted,
+    });
     setShowModal(true);
   };
 
   const handleToggleComplete = (id: number) => {
-    const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-    const updatedTasks = tasks.map((task: Task) =>
-      task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
-    );
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-    onToggleComplete(id);
+    onToggleComplete(id); // Backend integration can be done here too if needed
   };
 
   const handleClose = () => {
     setShowModal(false);
-    setFormData({ title: "", description: "" });
+    setFormData({ title: "", description: "", isCompleted: false });
   };
 
   const validateForm = (): boolean => {
@@ -75,40 +100,55 @@ const TaskList: React.FC<TaskListProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleCreateOrEdit = () => {
+  const handleCreateOrEdit = async () => {
     if (validateForm()) {
       const updatedTask = {
         id: selectedTask ? selectedTask.id : Date.now(),
         title: formData.title,
         description: formData.description,
-        isCompleted: selectedTask ? selectedTask.isCompleted : false,
+        isCompleted: !!formData.isCompleted,
         createdAt: selectedTask
           ? selectedTask.createdAt
           : new Date().toISOString(),
       };
-      if (selectedTask) {
-        onEdit(updatedTask);
-        const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-        const updatedTasks = tasks.map((task: Task) =>
-          task.id === selectedTask.id ? updatedTask : task
-        );
-        localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-        Swal.fire({
-          title: "Task Updated!",
-          text: "Your task has been updated successfully.",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
-      } else {
-        const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-        tasks.push(updatedTask);
-        localStorage.setItem("tasks", JSON.stringify(tasks));
+
+      try {
+        if (selectedTask) {
+          // Update existing task via API
+          const updatedTaskResponse = await updateTask(
+            selectedTask.id,
+            updatedTask
+          );
+          setTasks(
+            tasks.map((task) =>
+              task.id === updatedTaskResponse.id ? updatedTaskResponse : task
+            )
+          ); // Update the task in state
+          Swal.fire({
+            title: "Task Updated!",
+            text: "Your task has been updated successfully.",
+            icon: "success",
+            confirmButtonText: "OK",
+          });
+        } else {
+          // Create a new task via API
+          const newTaskResponse = await createTask(updatedTask);
+          setTasks([...tasks, newTaskResponse]); // Add new task to state
+          Swal.fire({
+            title: "Task Created!",
+            text: "Your task has been created successfully.",
+            icon: "success",
+            confirmButtonText: "OK",
+          });
+        }
+        handleClose(); // Close modal after success
+      } catch (error) {
+        console.error("Error creating/updating task:", error);
       }
-      handleClose();
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -117,16 +157,26 @@ const TaskList: React.FC<TaskListProps> = ({
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        onDelete(id);
-        Swal.fire("Deleted!", "Your task has been deleted.", "success");
+        try {
+          await deleteTask(id); // Call backend to delete the task
+          setTasks(tasks.filter((task) => task.id !== id)); // Remove from local state
+          Swal.fire("Deleted!", "Your task has been deleted.", "success");
+        } catch (error) {
+          console.error("Error deleting task:", error);
+        }
       }
     });
   };
 
+  const handleTaskCreated = (newTask: Task) => {
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+  };
+
   return (
     <>
+      <TaskForm onTaskCreated={handleTaskCreated} />
       <h2 className="text-center fw-bold mt-5">Task List</h2>
       <div className="table-responsive">
         <table className="table table-hover custom-table">
@@ -167,7 +217,10 @@ const TaskList: React.FC<TaskListProps> = ({
               name="title"
               value={formData.title}
               onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
+                setFormData({
+                  ...formData,
+                  title: e.target.value,
+                })
               }
               placeholder="Enter task title"
               className={`form-control ${errors.title ? "error-input" : ""}`}
@@ -194,6 +247,24 @@ const TaskList: React.FC<TaskListProps> = ({
             {errors.description && (
               <span className="error-message">{errors.description}</span>
             )}
+          </div>
+
+          <div className="formGroup">
+            <label>Status</label>
+            <select
+              name="isCompleted"
+              value={formData.isCompleted ? "true" : "false"}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  isCompleted: e.target.value === "true", // Convert string to boolean
+                })
+              }
+              className="form-control"
+            >
+              <option value="true">Completed</option>
+              <option value="false">Not Completed</option>
+            </select>
           </div>
         </Modal.Body>
         <Modal.Footer>
