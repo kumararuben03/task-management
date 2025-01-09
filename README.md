@@ -37,6 +37,8 @@ A modern and intuitive task management system built with **React (TypeScript)** 
 
 ### Clone the Repository
 
+To clone the repository into your local computer:
+
 ```bash
 git clone https://github.com/kumararuben03/task-management.git
 cd task-management
@@ -44,16 +46,47 @@ cd task-management
 
 ### For Frontend
 
+To install the required dependencies:
+
 ```bash
-cd task-management/frontend
+cd frontend
 npm install
+```
+
+To start the development server:
+
+```bash
+
+npm run dev
 ```
 
 ### For Backend
 
+To install packages:
+
 ```bash
-cd task-management/backend
+dotnet add package <package-name> --version <package-version>
+```
+
+To start the backend server:
+
+```bash
+cd backend
 dotnet watch run
+```
+
+### For Database
+
+To generate a migration file that describes changes done to the model:
+
+```bash
+dotnet ef migrations add Init
+```
+
+To update the database (MSSQL, MYSQL, any database of choice):
+
+```bash
+dotnet ef database update
 ```
 
 ## Screenshots
