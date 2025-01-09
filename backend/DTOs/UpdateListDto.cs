@@ -17,5 +17,6 @@ namespace backend.DTOs
     [Required]
     public bool IsCompleted { get; set; }
 
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

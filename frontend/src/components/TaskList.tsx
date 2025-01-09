@@ -108,8 +108,8 @@ const TaskList: React.FC<TaskListProps> = ({
         description: formData.description,
         isCompleted: !!formData.isCompleted,
         createdAt: selectedTask
-          ? selectedTask.createdAt
-          : new Date().toISOString(),
+          ? new Date().toISOString() // Update to current date on edit
+          : new Date().toISOString(), // Current date for new tasks
       };
 
       try {
@@ -123,7 +123,7 @@ const TaskList: React.FC<TaskListProps> = ({
             tasks.map((task) =>
               task.id === updatedTaskResponse.id ? updatedTaskResponse : task
             )
-          ); // Update the task in state
+          );
           Swal.fire({
             title: "Task Updated!",
             text: "Your task has been updated successfully.",
@@ -133,7 +133,7 @@ const TaskList: React.FC<TaskListProps> = ({
         } else {
           // Create a new task via API
           const newTaskResponse = await createTask(updatedTask);
-          setTasks([...tasks, newTaskResponse]); // Add new task to state
+          setTasks([...tasks, newTaskResponse]);
           Swal.fire({
             title: "Task Created!",
             text: "Your task has been created successfully.",

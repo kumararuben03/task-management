@@ -71,6 +71,7 @@ namespace backend.Controllers
             list.Title = updateListDto.Title;
             list.Description = updateListDto.Description;
             list.IsCompleted = updateListDto.IsCompleted;
+            list.CreatedAt = updateListDto.CreatedAt;
 
             await dbContext.SaveChangesAsync();
 

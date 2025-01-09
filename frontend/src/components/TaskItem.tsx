@@ -14,20 +14,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onDelete,
   onToggleComplete,
 }) => {
-  const dateOnlyString = task.createdAt; // Example: "2023-10-25"
-  const parsedDate = new Date(dateOnlyString); // Convert to JavaScript Date object
-
-  // Check if the date is valid
-  const isValidDate = !isNaN(parsedDate.getTime());
-
-  // Format the date for display
-  const formattedDate = isValidDate
-    ? parsedDate.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "Invalid Date";
+  const formattedDate = new Date(task.createdAt).toLocaleString();
 
   // console.log(dateOnlyString);
   // console.log(parsedDate);
@@ -37,7 +24,9 @@ const TaskItem: React.FC<TaskItemProps> = ({
     <tr>
       <td className="text-center">{task.title}</td>
       <td className="text-center">{task.description}</td>
-      <td className="text-center">{task.isCompleted ? "True" : "False"}</td>
+      <td className="text-center">
+        {task.isCompleted ? "Completed" : "Not Completed"}
+      </td>
       <td className="text-center">{formattedDate}</td>
       <td className="text-center">
         <button

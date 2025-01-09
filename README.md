@@ -6,11 +6,8 @@ A modern and intuitive task management system built with **React (TypeScript)** 
 
 ## Features
 
-- **User Authentication**: Secure login and registration system.
 - **Task Management**: Add, edit, delete, and mark tasks as complete.
-- **Responsive Design**: Fully optimized for desktop and mobile devices.
 - **Real-Time Updates**: Dynamic updates to task lists without page reloads.
-- **Sorting & Filtering**: Organize tasks by priority, status, or due date.
 
 ---
 
@@ -34,13 +31,35 @@ A modern and intuitive task management system built with **React (TypeScript)** 
 
 ### Prerequisites
 
-- Node.js (>=16.x)
+- React (TypeScript) + Vite - 18.3.1
 - .NET 8.0 SDK
 - SQLite (installed and configured)
 
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/task-management-system.git
-cd task-management-system
+git clone https://github.com/kumararuben03/task-management.git
+cd task-management
 ```
+
+### For Frontend
+
+```bash
+cd task-management/frontend
+npm install
+```
+
+### For Backend
+
+```bash
+cd task-management/backend
+dotnet watch run
+```
+
+## Screenshots
+
+![Alt Text](./frontend/src/assets/sample.png)
+_UI of the Task Management System_
+
+![Alt Text](./frontend/src/assets/swagger.png)
+_Swagger UI for API Documentation of the Task Management System_
